@@ -1,0 +1,11 @@
+Metadata-Version: 1.0
+Name: robotframework-rfserver
+Version: 0.1.0
+Summary: Simple running keywords server
+Home-page: UNKNOWN
+Author: Simo Soininen
+Author-email: soinisi@gmail.com
+License: MIT
+Description: UNKNOWN
+Keywords: robotframework,server
+Platform: UNKNOWN

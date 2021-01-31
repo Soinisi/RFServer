@@ -1,9 +1,9 @@
 from robot.libraries.BuiltIn import BuiltIn
-from robot.api.logger import logger
-from data_validator import validate_schema
+from robot.api import logger
+from RFServer.data_validator import validate_schema
 import time
 from datetime import datetime, timedelta
-from server_interface import RFServerInterface
+from RFServer.server_interface import RFServerInterface
 
 
 run_kw = BuiltIn().run_keyword
@@ -19,29 +19,30 @@ class RFServer:
 
 
     def main_loop(self, *args, **kwargs):
-        while True:
-            self.main_action(*args, **kwargs)
-
-
-    def main_action(self, *args, **kwargs):
-        while True:
-            kw_dict = self.interface.get_keyword_request(*args, **kwargs)
-
-            if kw_dict:
-                try:
-                    kw_dict = validate_schema(kw_dict)
-                    break
-                except Exception as e:
-                    response = self.interface.send_keyword_result({'error': str(e)})   
-                    logger.error(str(response))
+        run_server = True
+        while run_server:
+            run_server = self.main_action(*args, **kwargs)
             time.sleep(0.5)
 
-        self._import_library(kw_dict)
-        self._run_kw_with_error_handler(kw_dict)
+    def main_action(self, *args, **kwargs):
+       
+        kw_dict = self.interface.get_keyword_request(*args, **kwargs)
+
+        if kw_dict:
+            try:
+                kw_dict = validate_schema(kw_dict)
+            except Exception as e:
+                response = self.interface.send_keyword_result({'error': str(e)})   
+                logger.error(str(response))
         
-        if 'exit' in kw_dict and kw_dict['exit'] is True:
-            logger.info('Exiting RFServer')
-            return True
+
+            self._import_library(kw_dict)
+            self._run_kw_with_error_handler(kw_dict)
+        
+            if 'exit' in kw_dict and kw_dict['exit'] is True:
+                logger.info('Exiting RFServer', also_console = True)
+                return False
+    
 
 
 
@@ -82,7 +83,3 @@ class RFServer:
         
 
 
-
-
-if __name__ == "__main__":
-    print('test')

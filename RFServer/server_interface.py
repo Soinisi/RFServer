@@ -15,16 +15,4 @@ class RFServerInterface(metaclass = abc.ABCMeta):
 
 
 
-if __name__ == "__main__":
-    class Test(RFServerInterface):
-        
-        def get_keyword_request(self):
-            return {'test':'1111'}
 
-
-        def send_keyword_result(self, result):
-            return (result, 'ready')
-    
-
-    breakpoint()
-    
