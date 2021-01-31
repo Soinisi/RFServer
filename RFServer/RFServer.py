@@ -34,15 +34,18 @@ class RFServer:
             except Exception as e:
                 response = self.interface.send_keyword_result({'error': str(e)})   
                 logger.error(str(response))
-        
 
-            self._import_library(kw_dict)
-            self._run_kw_with_error_handler(kw_dict)
-        
+            if not self._expired_item(kw_dict):
+                self._import_library(kw_dict)
+                self._run_kw_with_error_handler(kw_dict)
+            else:
+                logger.warn('item with sender_id "' + kw_dict['sender_id'] + '" is expired!')
+
             if 'exit' in kw_dict and kw_dict['exit'] is True:
                 logger.info('Exiting RFServer', also_console = True)
                 return False
-    
+
+        return True
 
 
 
@@ -54,7 +57,7 @@ class RFServer:
             args = kw_dict['lib_args'] if 'lib_args' in kw_dict else []
             try:
                 import_lib(kw_dict['load_lib'], *args)
-                logger.info(kw_dict['load_lib'] + ' loaded')
+                logger.info(kw_dict['load_lib'] + ' loaded', also_console = True)
             except Exception as e:
                 logger.error(str(e))
     
@@ -81,5 +84,6 @@ class RFServer:
             logger.info(str(response))
 
         
-
+    def _expired_item(self, kw_dict):
+        return datetime.now() > kw_dict['expiration']
 

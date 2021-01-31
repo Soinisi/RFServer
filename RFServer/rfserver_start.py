@@ -16,7 +16,7 @@ class RFServerStart(RFServerInterface):
         kw_dict['expiration'] = parser.parse(kw_dict['expiration'])
         
         if 'exit' in kw_dict:
-            kw_dict['exit'] = eval(kw_dict['exit'])
+            kw_dict['exit'] = eval(kw_dict['exit'].strip().capitalize())
     
         return kw_dict
 
@@ -27,7 +27,11 @@ class RFServerStart(RFServerInterface):
 
 
 def run():
-    json_path = sys.argv[1]
+    try:
+        json_path = sys.argv[1]
+    except IndexError as e:
+        raise IndexError('First and only argument must be path to keyword json!') from e
+
     suite = TestSuite('RFServer')
     suite.resource.imports.library('RFServer', args = [RFServerStart()])
     test = suite.tests.create('RFserver test')
