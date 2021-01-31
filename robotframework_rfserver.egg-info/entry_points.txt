@@ -1,3 +1,0 @@
-[console_scripts]
-rf_server = RFServer.rfserver_start:run
-
