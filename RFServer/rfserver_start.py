@@ -26,6 +26,8 @@ class RFServerStart(RFServerInterface):
 
     def send_keyword_result(self, result: dict) -> dict:
         logger.console(str(result))
+        with open('output.json','w+') as output_file:
+            json.dump(result, output_file)
         return result
 
 
