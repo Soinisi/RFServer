@@ -22,7 +22,8 @@ class RFServer:
         run_server = True
         while run_server:
             run_server = self.main_action(*args, **kwargs)
-            time.sleep(0.5)
+            time.sleep(0.2)
+
 
     def main_action(self, *args, **kwargs):
        
@@ -34,6 +35,7 @@ class RFServer:
             except Exception as e:
                 response = self.interface.send_keyword_result({'error': str(e)})   
                 logger.error(str(response))
+                return True
 
             if not self._expired_item(kw_dict):
                 self._import_library(kw_dict)
