@@ -79,7 +79,7 @@ class RFServer:
                 result_dict['return_value'] = val
                 
             except Exception as e:
-                result_dict['kw_status'] = 'Fail'
+                result_dict['kw_status'] = 'fail'
                 result_dict['return_value'] = str(e)
                 
             response = self.interface.send_keyword_result(result_dict)
