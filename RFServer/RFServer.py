@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from RFServer.server_interface import RFServerInterface
 
 
+
 run_kw = BuiltIn().run_keyword
 import_lib = BuiltIn().import_library
 
@@ -13,7 +14,7 @@ import_lib = BuiltIn().import_library
 class RFServer:
     def __init__(self, interface):
         if not issubclass(type(interface), RFServerInterface):
-            raise TypeError('interface does not have RFServerInterface as parent Class!')
+            raise TypeError('interface does not have RFServerInterface as parent class!')
         
         self.interface = interface
 
@@ -26,15 +27,14 @@ class RFServer:
 
 
     def main_action(self, *args, **kwargs):
-       
-        kw_dict = self.interface.get_keyword_request(*args, **kwargs)
-
+        
+        kw_dict = self._get_keyword_request(*args, **kwargs)
+        
         if kw_dict:
             try:
                 kw_dict = validate_schema(kw_dict)
             except Exception as e:
-                response = self.interface.send_keyword_result({'error': str(e)})   
-                logger.error(str(response))
+                self._send_keyword_result({'error': str(e)}, kw_dict)   
                 return True
 
             if not self._expired_item(kw_dict):
@@ -53,7 +53,22 @@ class RFServer:
 
 
 #HELPERS------------------------------------------------------------------------------    
-    
+    def _get_keyword_request(self, *args, **kwargs):
+        try:
+            return self.interface.get_keyword_request(*args, **kwargs)
+        except Exception as e:
+            logger.error('get keyword request error: ' + str(e))
+            return {}
+
+
+    def _send_keyword_result(self, result, kw_dict):
+        try:
+            return self.interface.send_keyword_result(result, kw_dict)
+        except Exception as e:
+            logger.error('send keyword request error: ' + str(e))
+            return {}
+
+
     def _import_library(self, kw_dict: dict):
         if 'load_lib' in kw_dict:
             args = kw_dict['lib_args'] if 'lib_args' in kw_dict else []
@@ -62,7 +77,6 @@ class RFServer:
                 logger.info(kw_dict['load_lib'] + ' loaded', also_console = True)
             except Exception as e:
                 logger.error(str(e))
-    
     
 
     def _run_kw_with_error_handler(self, kw_dict: dict):
@@ -82,10 +96,12 @@ class RFServer:
                 result_dict['kw_status'] = 'fail'
                 result_dict['return_value'] = str(e)
                 
-            response = self.interface.send_keyword_result(result_dict)
+            response = self._send_keyword_result(result_dict, kw_dict)
             logger.info(str(response))
 
         
     def _expired_item(self, kw_dict):
         return datetime.now() > kw_dict['expiration']
+
+
 
