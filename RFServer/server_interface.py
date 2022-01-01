@@ -8,11 +8,6 @@ class RFServerInterface(metaclass = abc.ABCMeta):
 
     
     @abc.abstractmethod
-    def send_keyword_result(self, result: dict) -> dict:
+    def send_keyword_result(self, result: dict, kw_dict: dict) -> dict:
         pass
-
-
-
-
-
 
