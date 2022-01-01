@@ -40,12 +40,15 @@ class RFServer:
             if not self._expired_item(kw_dict):
                 self._import_library(kw_dict)
                 self._run_kw_with_error_handler(kw_dict)
+            
+                if 'exit' in kw_dict and kw_dict['exit'] is True:
+                    logger.info('Exiting RFServer', also_console = True)
+                    return False
+
             else:
                 logger.warn('item with sender_id "' + kw_dict['sender_id'] + '" is expired!')
 
-            if 'exit' in kw_dict and kw_dict['exit'] is True:
-                logger.info('Exiting RFServer', also_console = True)
-                return False
+            
 
         return True
 
