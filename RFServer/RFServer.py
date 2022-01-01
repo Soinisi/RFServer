@@ -23,7 +23,7 @@ class RFServer:
         run_server = True
         while run_server:
             run_server = self.main_action(*args, **kwargs)
-            time.sleep(0.2)
+            time.sleep(0.1)
 
 
     def main_action(self, *args, **kwargs):
@@ -47,6 +47,7 @@ class RFServer:
 
             else:
                 logger.warn('item with sender_id "' + kw_dict['sender_id'] + '" is expired!')
+                self._send_keyword_result({'error': 'item is expired'}, kw_dict)
 
             
 
@@ -73,7 +74,7 @@ class RFServer:
 
 
     def _import_library(self, kw_dict: dict):
-        if 'load_lib' in kw_dict:
+        if 'load_lib' in kw_dict and kw_dict['load_lib']:
             args = kw_dict['lib_args'] if 'lib_args' in kw_dict else []
             try:
                 import_lib(kw_dict['load_lib'], *args)
@@ -84,7 +85,7 @@ class RFServer:
 
     def _run_kw_with_error_handler(self, kw_dict: dict):
         
-        if 'keyword' in kw_dict:
+        if 'keyword' in kw_dict and kw_dict['keyword']:
             result_dict = {'sender_id': kw_dict['sender_id'],
                            'kw_status': '', 
                            'return_value': None}
@@ -105,6 +106,4 @@ class RFServer:
         
     def _expired_item(self, kw_dict):
         return datetime.now() > kw_dict['expiration']
-
-
 

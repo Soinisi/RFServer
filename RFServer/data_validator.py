@@ -7,7 +7,8 @@ SERVER_SCHEMA = Schema({Optional('keyword'): str,
                         Optional('lib_args'): list,
                         'sender_id': str,
                         'expiration': datetime,
-                        Optional('exit'): bool })
+                        Optional('exit'): bool,
+                        Optional('interface_data'): dict})
 
 #is this sound at some point?
 #KEYWORDS_DICT_SCHEMA = Schema({'keyword': str,
@@ -15,8 +16,7 @@ SERVER_SCHEMA = Schema({Optional('keyword'): str,
 
 
 
-def validate_schema(notice_dict):
-    
+def validate_schema(notice_dict): 
     SERVER_SCHEMA.validate(notice_dict)
 
     #is this sound at some point?
