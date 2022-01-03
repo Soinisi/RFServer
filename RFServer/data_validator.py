@@ -1,5 +1,5 @@
 from datetime import datetime
-from schema import Schema, Optional
+from schema import Schema, Optional, Or
 
 SERVER_SCHEMA = Schema({Optional('keyword'): str,
                         Optional('kw_args'): list,
@@ -10,18 +10,18 @@ SERVER_SCHEMA = Schema({Optional('keyword'): str,
                         Optional('exit'): bool,
                         Optional('interface_data'): dict})
 
-#is this sound at some point?
-#KEYWORDS_DICT_SCHEMA = Schema({'keyword': str,
-#                        Optional('args'): list})
+
+CONFIG_SCHEMA = Schema({'server': Schema({'debug': bool}, ignore_extra_keys = True),
+                        'robot': Or(dict, None),
+                         'interface': Schema({'path': str}, ignore_extra_keys = True)})
 
 
 
-def validate_schema(notice_dict): 
+def validate_server_schema(notice_dict):
     SERVER_SCHEMA.validate(notice_dict)
-
-    #is this sound at some point?
-    #if 'keywords' in notice_dict:
-    #    for kw_dict in notice_dict['keywords']:
-    #        KEYWORDS_DICT_SCHEMA.validate(kw_dict)
-
     return notice_dict
+
+
+def validate_config_schema(config_dict):
+    CONFIG_SCHEMA.validate(config_dict)
+    return config_dict['server'], config_dict['robot'], config_dict['interface']

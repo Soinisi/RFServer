@@ -1,22 +1,21 @@
 from robot.libraries.BuiltIn import BuiltIn
 from robot.api import logger
-from RFServer.data_validator import validate_schema
+from RFServer.data_validator import validate_server_schema
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 from RFServer.server_interface import RFServerInterface
-
-
 
 run_kw = BuiltIn().run_keyword
 import_lib = BuiltIn().import_library
 
 
 class RFServer:
-    def __init__(self, interface):
+    def __init__(self, interface, config):
         if not issubclass(type(interface), RFServerInterface):
             raise TypeError('interface does not have RFServerInterface as parent class!')
         
         self.interface = interface
+        self._config = config
 
 
     def main_loop(self, *args, **kwargs):
@@ -32,7 +31,7 @@ class RFServer:
         
         if kw_dict:
             try:
-                kw_dict = validate_schema(kw_dict)
+                kw_dict = validate_server_schema(kw_dict)
             except Exception as e:
                 self._send_keyword_result({'error': str(e)}, kw_dict)   
                 return True
@@ -59,17 +58,20 @@ class RFServer:
 #HELPERS------------------------------------------------------------------------------    
     def _get_keyword_request(self, *args, **kwargs):
         try:
-            return self.interface.get_keyword_request(*args, **kwargs)
+            req = self.interface.get_keyword_request(*args, **kwargs)
+            self._log_debug_info('Keyword request: ' + str(req))
+            return req
         except Exception as e:
-            logger.error('get keyword request error: ' + str(e))
+            self._log_debug_info('Get keyword request error: ' + str(e), True)
             return {}
 
 
     def _send_keyword_result(self, result, kw_dict):
         try:
-            return self.interface.send_keyword_result(result, kw_dict)
+            self._log_debug_info('Keyword result: ' + str(result))
+            self.interface.send_keyword_result(result, kw_dict)
         except Exception as e:
-            logger.error('send keyword request error: ' + str(e))
+            self._log_debug_info('send keyword request error: ' + str(e), True)
             return {}
 
 
@@ -78,13 +80,12 @@ class RFServer:
             args = kw_dict['lib_args'] if 'lib_args' in kw_dict else []
             try:
                 import_lib(kw_dict['load_lib'], *args)
-                logger.info(kw_dict['load_lib'] + ' loaded', also_console = True)
+                self._log_debug_info(kw_dict['load_lib'] + ' loaded')
             except Exception as e:
-                logger.error(str(e))
+                self._log_debug_info('Library import error: ' + str(e), True)
     
 
     def _run_kw_with_error_handler(self, kw_dict: dict):
-        
         if 'keyword' in kw_dict and kw_dict['keyword']:
             result_dict = {'sender_id': kw_dict['sender_id'],
                            'kw_status': '', 
@@ -107,3 +108,9 @@ class RFServer:
     def _expired_item(self, kw_dict):
         return datetime.now() > kw_dict['expiration']
 
+
+    def _log_debug_info(self, msg, log_err = False):
+        if self._config['debug']:
+            logger.info('\n' + msg, also_console = True)
+        if log_err:
+            logger.error(msg)

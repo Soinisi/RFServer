@@ -8,7 +8,7 @@ setup(name = 'robotframework-rfserver',
       author_email = 'soinisi@gmail.com',
       license = 'MIT',
       packages = ['RFServer'],
-      install_requires = ['Robotframework>3.0.0', 'schema', 'python-dateutil'],
+      install_requires = ['Robotframework>3.0.0', 'schema', 'python-dateutil', 'packaging', 'pyyaml'],
       entry_points = {
             'console_scripts': ['rf_server = RFServer.rfserver_start:run'],
       },
