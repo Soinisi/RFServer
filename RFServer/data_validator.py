@@ -13,7 +13,7 @@ SERVER_SCHEMA = Schema({Optional('keyword'): str,
 
 CONFIG_SCHEMA = Schema({'server': Schema({'debug': bool}, ignore_extra_keys = True),
                         'robot': Or(dict, None),
-                         'interface': Schema({'path': str}, ignore_extra_keys = True)})
+                        'interface': Schema({'path': str}, ignore_extra_keys = True)})
 
 
 

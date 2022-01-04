@@ -1,10 +1,9 @@
 import sys, os
 from robot.api import TestSuite
-from importlib import import_module 
+from importlib import import_module
 from importlib.util import spec_from_file_location, module_from_spec
 import re
 from yaml import safe_load
-from RFServer.interfaces.cmd_interface import RFServerStart
 from RFServer.data_validator import validate_config_schema
 from robot.version import VERSION
 from packaging import version
@@ -26,16 +25,8 @@ def run():
 
     interface_args = sys.argv[2:]
     
-
-    try:
-        module_path = interface_conf.pop('path')
-        interface_mod = import_module(module_path)
-    except ModuleNotFoundError:
-        module_pattern = re.compile(r'[\\|/]*(.*?)[.]py')
-        mod_name = module_pattern.search(module_path).group(1)
-        spec = spec_from_file_location(mod_name, module_path)
-        interface_mod = module_from_spec(spec)
-        spec.loader.exec_module(interface_mod)
+    module_path = interface_conf.pop('path')
+    interface_mod = _load_module(module_path)
 
     if not hasattr(interface_mod, 'get_interface'):
         raise NotImplementedError("'get_interface' function not implemented in loaded module!")
@@ -44,6 +35,20 @@ def run():
 
     _start_server(interface, server_conf, robot_conf)
     
+
+#Helpers----------------------------------------------------------------------------------------------------------
+
+def _load_module(module_path):
+    try:
+        interface_mod = import_module(module_path)
+    except ModuleNotFoundError:
+        module_pattern = re.compile(r'[\\|/]*(.*?)[.]py')
+        mod_name = module_pattern.search(module_path).group(1)
+        spec = spec_from_file_location(mod_name, module_path)
+        interface_mod = module_from_spec(spec)
+        spec.loader.exec_module(interface_mod)
+
+    return interface_mod
 
 
 def _start_server(interface, server_conf, robot_conf):

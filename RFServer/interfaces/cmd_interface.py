@@ -1,5 +1,4 @@
 import json
-from robot.api import logger
 from dateutil import parser
 from distutils.util import strtobool
 from RFServer.server_interface import RFServerInterface
@@ -7,7 +6,7 @@ from RFServer.server_interface import RFServerInterface
 class RFServerStart(RFServerInterface):
     
     def __init__(self, json_item):
-        self.json_item =json_item
+        self.json_item = json_item
 
     def get_keyword_request(self) -> dict:
         try:
