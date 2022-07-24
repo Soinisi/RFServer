@@ -1,0 +1,7 @@
+server: #RFServer options
+  debug: on #debug is mandatory
+robot: #Robot running options
+  output: null
+  log: null
+interface: #Interface options
+  path: local_http_interface #path to interface is mandatory
