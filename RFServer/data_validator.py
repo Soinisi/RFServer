@@ -1,13 +1,15 @@
+from ast import For
 from datetime import datetime
-from schema import Schema, Optional, Or
+from schema import Schema, Optional, Or, Forbidden
 
-SERVER_SCHEMA = Schema({Optional('keyword'): str,
+SERVER_SCHEMA = Schema({Or('keyword', 'exit'): Or(str, bool),
+                        Forbidden('keyword'): bool,
+                        Forbidden('exit'): str,
                         Optional('kw_args'): list,
                         Optional('load_lib'): str,
                         Optional('lib_args'): list,
                         'sender_id': str,
                         'expiration': datetime,
-                        Optional('exit'): bool,
                         Optional('interface_data'): dict})
 
 

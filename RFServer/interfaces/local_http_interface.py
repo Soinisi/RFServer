@@ -3,7 +3,6 @@ import json
 import cgi
 import time
 from threading import Thread
-import sys
 from dateutil import parser
 from distutils.util import strtobool
 from RFServer.server_interface import RFServerInterface
@@ -70,10 +69,6 @@ class LocalHttpServer(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
         self.end_headers()
-
-
-def run_server(http_server, port):
-    print('starting httpd in port')
 
 
 def get_interface(**kwargs):
