@@ -19,14 +19,14 @@ class RFServer:
 
 
     def main_loop(self, *args, **kwargs):
-        run_server = True
-        while run_server:
+        while True:
             run_server = self.main_action(*args, **kwargs)
             time.sleep(0.01)
+            if not run_server:
+                return
 
 
     def main_action(self, *args, **kwargs):
-
         kw_dict = self._get_keyword_request(*args, **kwargs)
 
         if kw_dict:
@@ -43,7 +43,6 @@ class RFServer:
                 if 'exit' in kw_dict and kw_dict['exit'] is True:
                     logger.info('Exiting RFServer', also_console = True)
                     return False
-
             else:
                 logger.warn('item with sender_id "' + kw_dict['sender_id'] + '" is expired!')
                 self._send_keyword_result({'error': 'item is expired'}, kw_dict)
